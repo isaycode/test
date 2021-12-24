@@ -1,46 +1,144 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Ping Pong Game</title>
+	<title>Ping Pong </title>
+	<link rel="stylesheet" href="css/game.css">
 </head>
 <body>
-	<canvas id="canvas" width="800" height="400"></canvas>
+	<canvas id="canvas"></canvas>
 	<script type="text/javascript" src="js/app.js"></script>
+	<script type="text/javascript" src="js/screenresize.js"></script>
+	<script type="text/javascript" src="js/paddle.js"></script>
+	<script type="text/javascript" src="js/Ball.js"></script>
+	
+	
+	
 	<script type="text/javascript">
-		//Sample functions, remove these functions and design ping-pong game with onInit and onUpdate.
+		const borderWidth = 20;
+		const margin = 10;
+
+		let player1;
+		let player2;
+		let ball;
+		//let ball = document.createElementNS("circle");
+
+		app.restartMatch = function() {
+			ball.resetPosition();
+			player1.resetPosition();
+			player2.resetPosition();
+		}
 
 		app.onInit = function(){
+			app.reset();
+			app.initialised = true;
+		};
+
+		// pause toggle function
+		app.pause = function() {
+			app.paused = !app.paused;
+		}
+
+		// reset function
+		app.reset = function() {
+			this.nodes = [];
+
+			// add nodes
 			this.nodes.push({
-				id : 'red-box',
-				x  : 100,
+				id : 'mid',
+				x  : app.width / 2 - (borderWidth) / 2,
 				y  : 0,
-				width  : 100,
-				height : 100,
-				color  : 'red',
-				direction : 0
+				width  : borderWidth,
+				height : app.height,
+				color  : 'black',
+				draw : function(context)
+				{
+				
+					context.beginPath();
+					context.setLineDash([7, 15]);
+					context.moveTo((app.width / 2), app.height - 10);
+					context.lineTo((app.width /2), 2);
+					context.lineWidth = 10;
+					context.strokeStyle = 'red';
+					context.stroke();
+
+				 }
+
+
+			
+				
+				
 			});
 
 			this.nodes.push({
-				id : 'black-box',
-				x  : 50,
-				y  : 0,
-				width  : 150,
-				height : 150,
-				color  : 'black'
+				id : 'bottom',
+				x  : 2,
+				y  : app.height -15 ,
+				width  : app.width,
+				height : borderWidth ,
+				color  : 'grey',
 			});
-		};
+
+			this.nodes.push({
+				id : 'left',
+				x  : app.width / 700 ,
+				y  : 0,
+				width  : borderWidth /4,
+				height : app.height,
+				color  : 'grey',
+			});
+
+			this.nodes.push({
+				id : 'right',
+				x  : (app.width/2) + 395 ,
+				y  : 0,
+				width  : borderWidth /4,
+				height : app.height,
+				color  : 'grey',
+			});
+
+	
+
+
+			player1 = new paddle('player1', margin, app.height / 2 - (PADDLE_HEIGHT / 2), 'w', 's', "red");
+			player2 = new paddle('player2', app.width - margin - PADDLE_WIDTH , app.height / 2 - (PADDLE_HEIGHT / 2), 'ArrowUp', 'ArrowDown',"green");
+			ball = new Ball('ball', app.width / 2 - (ballSize / 2), app.height / 2 - (ballSize / 2));
+
+			this.nodes.push(player1);
+			this.nodes.push(player2);
+			this.nodes.push(ball);
+
+			
+		}
+
+		// add app key bindings
+		document.addEventListener("keyup", function(event) {
+			if (event.code === 'Space') {
+				app.pause();
+			} else if (event.key === 'r') {
+				app.reset();
+			}
+		});
 
 		app.onUpdate = function(time){
-			this.getNode('black-box').y++;
-
-			if(Math.cos(this.timestamp / 100) > 0){
-				this.getNode('red-box').direction = -1;
-			}else{
-				this.getNode('red-box').direction = 1;
+			if (!app.initialised) {
+				return;
 			}
 
-			this.getNode('red-box').x+=this.getNode('red-box').direction;
+			if (!app.paused) {
+				// update
+				player1.update(time);
+				player2.update(time);
+				ball.update(time);
+			}
+
+			// draw
+			app.context.textAlign = 'right';
+			app.context.fillText(`Score: ${player1.getScore()}`,app.width / 2 - margin - borderWidth, margin + 60, app.width/2);
+			app.context.textAlign = 'left';
+			app.context.fillText(player2.getScore(), app.width / 2 + margin + borderWidth, margin + 60, app.width/2);
 		};
+				
+
 	</script>
 </body>
 </html>
