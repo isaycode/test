@@ -56,6 +56,7 @@ class Ball {
         if (this.#collisionDetect(paddle)) {
 
             //hitSound.play();
+            document.getElementById("hitsound").play();
             
             let angle = 0;
 
@@ -84,15 +85,18 @@ class Ball {
         // check if ball hits top or bottom wall
         if (this.y + this.height >= app.height || this.y <= 0) {
             this.velocityY = -this.velocityY;
+            document.getElementById("wallHitSound").play();
         }
 
         // right side
         if (this.x > app.width) {
+            document.getElementById("scoresound").play();
             app.getNode('player1').addScore();
             app.restartMatch();
         }
         // left side
         else if (this.x + this.width < 0) {
+            document.getElementById("scoresound").play();
             app.getNode('player2').addScore();
             app.restartMatch();
         }
