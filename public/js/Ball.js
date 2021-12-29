@@ -1,12 +1,8 @@
 const startSpeed = 8;
-
 const ballSize = 10;
 const velocityX= 5;
 const velocityY= 5;
-//const ctx = canvas.getContext('2d');
-/**
- * The ball that bounces back and forth
- */
+
 class Ball {
     constructor(id, x, y) {
         this.id = id;
@@ -32,13 +28,6 @@ class Ball {
         this.speed = startSpeed;
         this.velocityX = -this.velocityX;
         this.velocityY = -this.velocityY;
-        // this.velocityY = 0;
-        // while (this.velocityY == 0) 
-        // {
-        //     this.velocityY = (Math.random() * 10) - 5;
-
-        // }
-        // this.velocityX = this.direction * (6 - Math.abs(this.velocityY));
         
     }
 
@@ -62,80 +51,52 @@ class Ball {
     }
 
     #checkForPlayercollision() {
+        let paddle = (this.x < app.width / 2) ? app.getNode('player1') : app.getNode('player2');
 
-        if (this.x < app.width / 2)
-        {
-            var paddle=app.getNode('player1');
-            if (this.#collisionDetect(paddle, this)) {
-                // default angle is 0deg in Radian
-               let angle = 0;
-     
-               // if ball hit the top of paddle
-               if (this.y < (paddle.y + paddle.height / 2)) 
-               {
-                   // then -1 * Math.PI / 4 = -45deg
-                   angle = -1 * Math.PI / 4;
-               } 
-               else if (this.y > (paddle.y + paddle.height / 2)) 
-               {
-                   // if it hit the bottom of paddle
-                   // then angle will be Math.PI / 4 = 45deg
-                   angle = Math.PI / 4;
-               }
-   
-               // change velocity of ball according to which paddle the ball hits
-               this.velocityX = (paddle ===app.getNode('player1') ? 1 : -1) * this.speed * Math.cos(angle);
-               this.velocityY = this.speed * Math.sin(angle);
-   
-               // increase ball speed
-               this.speed +=.5;
-           }
+        if (this.#collisionDetect(paddle)) {
+
+            //hitSound.play();
+            document.getElementById("hitsound").play();
+            
+            let angle = 0;
+
+            // if ball hit the top of paddle
+            if (this.y < (paddle.y + paddle.height / 2)) {
+                angle = -1 * Math.PI / 4;
+            }
+            // if it hit the bottom of paddle
+            else if (this.y > (paddle.y + paddle.height / 2)) {
+                angle = Math.PI / 4;
+            }
+
+            // change velocity of ball according to which paddle the ball hits
+            this.velocityX = (paddle === app.getNode('player1') ? 1 : -1) * this.speed * Math.cos(angle);
+            this.velocityY = this.speed * Math.sin(angle);
+
+            // increase ball speed
+            this.speed += .2;
         }
-        else
-        {
-            var paddle=app.getNode('player2');
-            if (this.#collisionDetect(paddle, this)) {
-                // default angle is 0deg in Radian
-               let angle = 0;
-     
-               // if ball hit the top of paddle
-               if (this.y < (paddle.y + paddle.height / 2)) 
-               {
-                   // then -1 * Math.PI / 4 = -45deg
-                   angle = -1 * Math.PI / 4;
-               } 
-               else if (this.y > (paddle.y + paddle.height / 2)) 
-               {
-                   // if it hit the bottom of paddle
-                   // then angle will be Math.PI / 4 = 45deg
-                   angle = Math.PI / 4;
-               }
-   
-               // change velocity of ball according to which paddle the ball hits
-               this.velocityX = (paddle ===app.getNode('player2') ? -1 : 1) * this.speed * Math.cos(angle);
-               this.velocityY = this.speed * Math.sin(angle);
-   
-               // increase ball speed
-               this.speed +=.5;
-           }
-        }
-        
-        
     }
+        
+        
+    
 
     #checkForWallHit() {
         // check if ball hits top or bottom wall
         if (this.y + this.height >= app.height || this.y <= 0) {
             this.velocityY = -this.velocityY;
+            document.getElementById("wallHitSound").play();
         }
 
         // right side
         if (this.x > app.width) {
+            document.getElementById("scoresound").play();
             app.getNode('player1').addScore();
             app.restartMatch();
         }
         // left side
         else if (this.x + this.width < 0) {
+            document.getElementById("scoresound").play();
             app.getNode('player2').addScore();
             app.restartMatch();
         }

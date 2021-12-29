@@ -49,6 +49,12 @@ class paddle {
         }
     }
 
+    #clamp() {
+        let min = 0;
+        let max = app.height - this.height;
+        this.y = Math.min(Math.max(this.y, min), max);
+    }
+
     #movePaddle(){
         if(this.up) {
             this.moveUp();
@@ -78,6 +84,7 @@ class paddle {
 
 
     update(time) {
+        this.#clamp();
         this.#movePaddle();
     }
 
